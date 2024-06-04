@@ -10,7 +10,7 @@ public class Spawn : MonoBehaviour
         MovableEnemy movableEnemy = collider.gameObject.GetComponent<MovableEnemy>();
         if (movableEnemy != null)
         {
-            gameObject.GetComponentInParent<RowManager>().SpawnEvent(movableEnemy.nextSpawnGap * new Vector3(0, 0, 1));
+            gameObject.GetComponentInParent<WithEnemyRowManager>().SpawnEvent(movableEnemy.nextSpawnGap);
         }
     }
 }

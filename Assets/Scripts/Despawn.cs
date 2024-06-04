@@ -9,7 +9,7 @@ public class Despawn : MonoBehaviour
         MovableEnemy movableEnemy = collider.gameObject.GetComponent<MovableEnemy>();
         if (movableEnemy != null)
         {
-            gameObject.GetComponentInParent<RowManager>().DespawnEvent(collider.gameObject);
+            gameObject.GetComponentInParent<WithEnemyRowManager>().DespawnEvent(collider.gameObject);
         }
     }
 }

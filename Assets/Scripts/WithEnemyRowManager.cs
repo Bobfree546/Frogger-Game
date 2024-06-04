@@ -4,10 +4,12 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.VFX;
 
-public class RowManager : MonoBehaviour
+public class WithEnemyRowManager : MonoBehaviour
 {
     private List<GameObject> EnemyList;
-    private static Vector3 FIRST_SPAWN_LOCATION = new Vector3(0, 1, 7);
+    private static Vector3 FIRST_ENEMY_SPAWN_LOCATION = new Vector3(7, 1, 0);
+
+    public static Vector3 ROW_SHIFT = new Vector3(0, 0, 1);
 
     public GameObject movableEnemyPrefab;
 
@@ -15,7 +17,7 @@ public class RowManager : MonoBehaviour
     void Start()
     {
         EnemyList = new List<GameObject>();
-        Spawn(FIRST_SPAWN_LOCATION);
+        Spawn(FIRST_ENEMY_SPAWN_LOCATION);
     }
 
     // Update is called once per frame
@@ -24,9 +26,9 @@ public class RowManager : MonoBehaviour
 
     }
 
-    public void SpawnEvent(Vector3 nextSpawnGap)
+    public void SpawnEvent(int nextSpawnGap)
     {
-        Vector3 spawnLocation = transform.position + FIRST_SPAWN_LOCATION + nextSpawnGap;
+        Vector3 spawnLocation = FIRST_ENEMY_SPAWN_LOCATION + nextSpawnGap * new Vector3(1, 0, 0) - new Vector3(0.2f, 0, 0);
         Debug.Log(spawnLocation);
         Spawn(spawnLocation);
     }
@@ -39,9 +41,11 @@ public class RowManager : MonoBehaviour
 
     void Spawn(Vector3 spawnLocation)
     {
+        spawnLocation += transform.position; //set spawn relative to row
+
         GameObject spawnedEnemy = Instantiate(movableEnemyPrefab, spawnLocation, Quaternion.identity);
         EnemyList.Add(spawnedEnemy);
-        spawnedEnemy.GetComponent<MovableEnemy>().nextSpawnGap = Random.Range(2, 10);
+        spawnedEnemy.GetComponent<MovableEnemy>().nextSpawnGap = Random.Range(4 , 10);
     }
 
 

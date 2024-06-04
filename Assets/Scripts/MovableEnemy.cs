@@ -33,6 +33,6 @@ public class MovableEnemy : MonoBehaviour
 
     private void Move()
     {
-        transform.position += Time.deltaTime * SPEED * new Vector3(0, 0, -1);
+        transform.position += Time.deltaTime * SPEED * new Vector3(-1, 0, 0);
     }
 }
