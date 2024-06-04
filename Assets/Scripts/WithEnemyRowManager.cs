@@ -29,7 +29,6 @@ public class WithEnemyRowManager : MonoBehaviour
     public void SpawnEvent(int nextSpawnGap)
     {
         Vector3 spawnLocation = FIRST_ENEMY_SPAWN_LOCATION + nextSpawnGap * new Vector3(1, 0, 0) - new Vector3(0.2f, 0, 0);
-        Debug.Log(spawnLocation);
         Spawn(spawnLocation);
     }
 
