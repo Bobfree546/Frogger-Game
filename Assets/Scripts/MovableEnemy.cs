@@ -2,11 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class MovableEnemy : MonoBehaviour
 {
     public const float SPEED = 2f;
+    public const int LEFT_TO_RIGHT = 1;
+    public const int RIGHT_TO_LEFT = -1;
 
+    private int moveDirection = RIGHT_TO_LEFT;
     private bool collided = false;
     public int nextSpawnGap = 0;
 
@@ -30,9 +34,17 @@ public class MovableEnemy : MonoBehaviour
     {
         collided = true;
     }
-
+        
     private void Move()
     {
-        transform.position += Time.deltaTime * SPEED * new Vector3(-1, 0, 0);
+        if (moveDirection == RIGHT_TO_LEFT)
+            transform.position += Time.deltaTime * SPEED * new Vector3(-1, 0, 0);
+        else
+            transform.position += Time.deltaTime * SPEED * new Vector3(1, 0, 0);
+    }
+
+    public void SetDirection(int direction)
+    {
+        moveDirection = direction;
     }
 }
