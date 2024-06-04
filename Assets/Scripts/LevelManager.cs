@@ -10,8 +10,9 @@ public class SceneManager : MonoBehaviour
     private static Vector3 FIRST_ROW_SPAWN_LOCATION = new Vector3(0, 0, 0);
     private const int ROWS_IN_ADVANCE = 50;
     private const float FLIP_CHANCE = 1f; //chance for the next spawn to flip (0 to 1)
-    private const float NO_ENEMY_ROW_CHANCE = 0.45f;
 
+    private int rowCountdown = 0;
+    private bool spawnSafe = false;
     private int maxRowNum = 0;
     private int rowDirection = WithEnemyRowManager.SPAWN_FROM_RIGHT_MOVE_TO_LEFT;
     private GameObject player;
@@ -36,18 +37,29 @@ public class SceneManager : MonoBehaviour
     {
         if (maxRowNum < (player.GetComponent<Player>().verticalCoordinate + ROWS_IN_ADVANCE))
         {
-            float noEnemyResult = Random.Range(0f, 1f);
-            
-            if (noEnemyResult <= NO_ENEMY_ROW_CHANCE)
-            {
-                SpawnWithoutEnemyRow();
-            }
-            else
-            {
-                SpawnWithEnemyRow();
-            }
-            maxRowNum++;
+            SpawnRow();
         }
+    }
+
+  
+    private void SpawnRow()
+    {
+        if (rowCountdown == 0)
+        {
+            spawnSafe = !spawnSafe;
+            if (spawnSafe)
+                rowCountdown = Random.Range(1, 3); //1 to 2
+            else
+                rowCountdown = Random.Range(1, 4); //1 to 3
+        }
+
+        if (spawnSafe)
+            SpawnWithoutEnemyRow();
+        else
+            SpawnWithEnemyRow();
+
+        rowCountdown--;
+        maxRowNum++;
     }
 
     private void SpawnLevel()
@@ -56,6 +68,7 @@ public class SceneManager : MonoBehaviour
 
         GameObject firstRow = Instantiate(withoutEnemyRowPrefab, FIRST_ROW_SPAWN_LOCATION, Quaternion.identity); //Spawn First Row
         rowQueue.Enqueue(firstRow);
+        rowCountdown = Random.Range(1, 4); //set first few spawns to be dangerous
     }
 
     private void SpawnWithEnemyRow()
