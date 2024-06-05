@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UIElements;
 
-public class SceneManager : MonoBehaviour
+public class LevelManager : MonoBehaviour
 {
     private static Vector3 PLAYER_SPAWN_LOCATION = new Vector3(0, 1, 0);
     private static Vector3 FIRST_ROW_SPAWN_LOCATION = new Vector3(0, 0, 0);
     private const int ROWS_AHEAD = 50; //How many rows ahead to spawn (excluding the one that player is standing on)
     private const int ROWS_BEHIND = 20; //How many rows behind to keep (excluding the one that player is standing on)
     private const float FLIP_CHANCE = 1f; //chance for the next spawn to flip (0 to 1)
+    public const int MIN_HORIZONTAL_COORDINATE = -5;
+    public const int MAX_HORIZONTAL_COORDINATE = 5;
 
     private int rowCountdown = 0;
     private bool spawnSafe = false;
@@ -48,6 +51,7 @@ public class SceneManager : MonoBehaviour
     private void SpawnLevel()
     {
         player = Instantiate(playerPrefab, PLAYER_SPAWN_LOCATION, Quaternion.identity); //Spawn Player
+        player.GetComponent<Player>().setLevelManager(this);
 
         GameObject firstRow = Instantiate(withoutEnemyRowPrefab, FIRST_ROW_SPAWN_LOCATION, Quaternion.identity); //Spawn First Row (Row num is 0)
         rowQueue.Enqueue(firstRow);
@@ -67,7 +71,7 @@ public class SceneManager : MonoBehaviour
             spawnSafe = !spawnSafe;
             if (spawnSafe)
             {
-                guaranteedPath = Random.Range(Player.MIN_HORIZONTAL_COORDINATE, Player.MAX_HORIZONTAL_COORDINATE + 1); //Max Exclusive
+                guaranteedPath = Random.Range(MIN_HORIZONTAL_COORDINATE, MAX_HORIZONTAL_COORDINATE + 1); //Max Exclusive
                 rowCountdown = Random.Range(1, 3); //1 to 2
             }
             else
@@ -116,6 +120,7 @@ public class SceneManager : MonoBehaviour
         GameObject previousRow = rowQueue.Last();
         Vector3 newPosition = previousRow.transform.position + WithoutEnemyRowManager.ROW_SHIFT;
         GameObject row = Instantiate(withoutEnemyRowPrefab, newPosition, Quaternion.identity);
+        row.GetComponent<WithoutEnemyRowManager>().CreateObstacles();
         row.GetComponent<WithoutEnemyRowManager>().guaranteedPath = guaranteedPath;
         row.GetComponent<WithoutEnemyRowManager>().MakeGuaranteedPath();
         rowQueue.Enqueue(row);
@@ -132,5 +137,25 @@ public class SceneManager : MonoBehaviour
         Destroy(row);
 
         minRowNum++;
+    }
+
+    public bool IsValidMove(int row, int column)
+    {
+        if (row < minRowNum)
+            return false;
+        if (column < MIN_HORIZONTAL_COORDINATE || column > MAX_HORIZONTAL_COORDINATE)
+            return false;
+
+        Debug.Log("checked");
+        GameObject[] rowArray = rowQueue.ToArray();
+        GameObject rowObject;
+        rowObject = rowArray[row - minRowNum];
+        if (rowObject.GetComponent<WithoutEnemyRowManager>() != null)
+        {
+            if (rowObject.GetComponent<WithoutEnemyRowManager>().obstacles.ContainsKey(column))
+                return false;
+        }
+
+        return true;
     }
 }

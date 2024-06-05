@@ -10,12 +10,11 @@ public class Player : MonoBehaviour
     private const string UP = "Up";
     private const string DOWN = "Down";
     private const float PLAYER_SPEED = 10f;
-    public const int MIN_HORIZONTAL_COORDINATE = -5;
-    public const int MAX_HORIZONTAL_COORDINATE = 5;
 
     private Vector3 currentPos;
     private Queue<Vector3> movementQueue;
     private bool moving = false;
+    private LevelManager levelManager;
 
     public int horizontalCoordinate = 0; //range from -5 to 5 inclusive
     public int verticalCoordinate = 0;
@@ -62,41 +61,48 @@ public class Player : MonoBehaviour
     {
         Vector3 positionDifference = new Vector3(0, 0, 0);
 
+        int tempHorizontalCoordinate = horizontalCoordinate;
+        int tempVerticalCoordinate = verticalCoordinate;
+
         if (movementQueue.Count < 1)
         {
             switch (direction)
             {
                 case LEFT:
-                    if (horizontalCoordinate > MIN_HORIZONTAL_COORDINATE)
-                    {
-                        horizontalCoordinate -= 1;
-                        positionDifference = new Vector3(-1, 0, 0);
-                    }
+                    horizontalCoordinate -= 1;
+                    positionDifference = new Vector3(-1, 0, 0);
                     break;
                 case RIGHT:
-                    if (horizontalCoordinate < MAX_HORIZONTAL_COORDINATE)
-                    {
-                        horizontalCoordinate += 1;
-                        positionDifference = new Vector3(1, 0, 0);
-                    }
+                    horizontalCoordinate += 1;
+                    positionDifference = new Vector3(1, 0, 0);
                     break;
                 case UP:
                     verticalCoordinate += 1;
                     positionDifference = new Vector3(0, 0, 1);
                     break;
                 case DOWN:
-                    if (verticalCoordinate > 0)
-                    {
-                        verticalCoordinate -= 1;
-                        positionDifference = new Vector3(0, 0, -1);
-                    }
+                    verticalCoordinate -= 1;
+                    positionDifference = new Vector3(0, 0, -1);
                     break;
             }
 
-            movementQueue.Enqueue(positionDifference);
+            if (levelManager.IsValidMove(verticalCoordinate, horizontalCoordinate))
+            {
+                movementQueue.Enqueue(positionDifference);
+            }
+            else 
+            {
+                horizontalCoordinate = tempHorizontalCoordinate;
+                verticalCoordinate = tempVerticalCoordinate;
+            }
+
         }
     }
 
+    public void setLevelManager(LevelManager levelManager)
+    {
+        this.levelManager = levelManager;
+    }
     private IEnumerator MoveToNextDestination()
     {
         float time = 0;

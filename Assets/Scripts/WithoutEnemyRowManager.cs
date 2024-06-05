@@ -15,7 +15,7 @@ public class WithoutEnemyRowManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        CreateObstacles();
+
     }
 
     // Update is called once per frame
@@ -24,7 +24,7 @@ public class WithoutEnemyRowManager : MonoBehaviour
 
     }
 
-    private void CreateObstacles()
+    public void CreateObstacles()
     {
         for (int column = -5; column <= 5; column++)
         {
