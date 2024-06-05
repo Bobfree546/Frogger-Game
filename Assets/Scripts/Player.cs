@@ -10,8 +10,8 @@ public class Player : MonoBehaviour
     private const string UP = "Up";
     private const string DOWN = "Down";
     private const float PLAYER_SPEED = 10f;
-    private const int MIN_HORIZONTAL_COORDINATE = -5;
-    private const int MAX_HORIZONTAL_COORDINATE = 5;
+    public const int MIN_HORIZONTAL_COORDINATE = -5;
+    public const int MAX_HORIZONTAL_COORDINATE = 5;
 
     private Vector3 currentPos;
     private Queue<Vector3> movementQueue;
@@ -61,7 +61,6 @@ public class Player : MonoBehaviour
     void Move(string direction)
     {
         Vector3 positionDifference = new Vector3(0, 0, 0);
-
 
         if (movementQueue.Count < 1)
         {

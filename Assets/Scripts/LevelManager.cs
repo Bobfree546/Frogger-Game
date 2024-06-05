@@ -29,9 +29,6 @@ public class SceneManager : MonoBehaviour
     {
         rowQueue = new Queue<GameObject>();
         SpawnLevel();
-        
-        
-
     }
 
     // Update is called once per frame
@@ -48,27 +45,6 @@ public class SceneManager : MonoBehaviour
         }
     }
 
-  
-    private void SpawnRow()
-    {
-        if (rowCountdown == 0)
-        {
-            spawnSafe = !spawnSafe;
-            if (spawnSafe)
-                rowCountdown = Random.Range(1, 3); //1 to 2
-            else
-                rowCountdown = Random.Range(1, 4); //1 to 3
-        }
-
-        if (spawnSafe)
-            SpawnWithoutEnemyRow();
-        else
-            SpawnWithEnemyRow();
-
-        rowCountdown--;
-        maxRowNum++;
-    }
-
     private void SpawnLevel()
     {
         player = Instantiate(playerPrefab, PLAYER_SPAWN_LOCATION, Quaternion.identity); //Spawn Player
@@ -76,6 +52,38 @@ public class SceneManager : MonoBehaviour
         GameObject firstRow = Instantiate(withoutEnemyRowPrefab, FIRST_ROW_SPAWN_LOCATION, Quaternion.identity); //Spawn First Row (Row num is 0)
         rowQueue.Enqueue(firstRow);
         rowCountdown = Random.Range(1, 4); //set first few spawns to be dangerous
+    }
+
+    private void SpawnRow()
+    {
+        int guaranteedPath = 0;
+        if (spawnSafe)
+        {
+            guaranteedPath = rowQueue.Last().GetComponent<WithoutEnemyRowManager>().guaranteedPath;
+        }
+
+        if (rowCountdown == 0)
+        {
+            spawnSafe = !spawnSafe;
+            if (spawnSafe)
+            {
+                guaranteedPath = Random.Range(Player.MIN_HORIZONTAL_COORDINATE, Player.MAX_HORIZONTAL_COORDINATE + 1); //Max Exclusive
+                rowCountdown = Random.Range(1, 3); //1 to 2
+            }
+            else
+                rowCountdown = Random.Range(1, 4); //1 to 3
+        }
+
+        if (spawnSafe)
+        {
+            SpawnWithoutEnemyRow(guaranteedPath);
+        }
+            
+        else
+            SpawnWithEnemyRow();
+
+        rowCountdown--;
+        maxRowNum++;
     }
 
     private void SpawnWithEnemyRow()
@@ -103,11 +111,13 @@ public class SceneManager : MonoBehaviour
         }
     }
 
-    private void SpawnWithoutEnemyRow()
+    private void SpawnWithoutEnemyRow(int guaranteedPath)
     {
         GameObject previousRow = rowQueue.Last();
         Vector3 newPosition = previousRow.transform.position + WithoutEnemyRowManager.ROW_SHIFT;
         GameObject row = Instantiate(withoutEnemyRowPrefab, newPosition, Quaternion.identity);
+        row.GetComponent<WithoutEnemyRowManager>().guaranteedPath = guaranteedPath;
+        row.GetComponent<WithoutEnemyRowManager>().MakeGuaranteedPath();
         rowQueue.Enqueue(row);
     }
 
