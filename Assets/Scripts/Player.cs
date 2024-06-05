@@ -10,12 +10,14 @@ public class Player : MonoBehaviour
     private const string UP = "Up";
     private const string DOWN = "Down";
     private const float PLAYER_SPEED = 10f;
+    private const int MIN_HORIZONTAL_COORDINATE = -5;
+    private const int MAX_HORIZONTAL_COORDINATE = 5;
 
     private Vector3 currentPos;
     private Queue<Vector3> movementQueue;
     private bool moving = false;
 
-    public int horizontalCoordinate = 5; //range from 0 to 10 inclusive
+    public int horizontalCoordinate = 0; //range from -5 to 5 inclusive
     public int verticalCoordinate = 0;
     // Start is called before the first frame update
     void Start()
@@ -66,14 +68,14 @@ public class Player : MonoBehaviour
             switch (direction)
             {
                 case LEFT:
-                    if (horizontalCoordinate > 0)
+                    if (horizontalCoordinate > MIN_HORIZONTAL_COORDINATE)
                     {
                         horizontalCoordinate -= 1;
                         positionDifference = new Vector3(-1, 0, 0);
                     }
                     break;
                 case RIGHT:
-                    if (horizontalCoordinate < 10)
+                    if (horizontalCoordinate < MAX_HORIZONTAL_COORDINATE)
                     {
                         horizontalCoordinate += 1;
                         positionDifference = new Vector3(1, 0, 0);
@@ -81,13 +83,12 @@ public class Player : MonoBehaviour
                     break;
                 case UP:
                     verticalCoordinate += 1;
-                    {
-                        positionDifference = new Vector3(0, 0, 1);
-                    }
+                    positionDifference = new Vector3(0, 0, 1);
                     break;
                 case DOWN:
-                    verticalCoordinate -= 1;
+                    if (verticalCoordinate > 0)
                     {
+                        verticalCoordinate -= 1;
                         positionDifference = new Vector3(0, 0, -1);
                     }
                     break;
