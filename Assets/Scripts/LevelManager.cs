@@ -8,12 +8,14 @@ public class SceneManager : MonoBehaviour
 {
     private static Vector3 PLAYER_SPAWN_LOCATION = new Vector3(0, 1, 0);
     private static Vector3 FIRST_ROW_SPAWN_LOCATION = new Vector3(0, 0, 0);
-    private const int ROWS_IN_ADVANCE = 50;
+    private const int ROWS_AHEAD = 50; //How many rows ahead to spawn (excluding the one that player is standing on)
+    private const int ROWS_BEHIND = 20; //How many rows behind to keep (excluding the one that player is standing on)
     private const float FLIP_CHANCE = 1f; //chance for the next spawn to flip (0 to 1)
 
     private int rowCountdown = 0;
     private bool spawnSafe = false;
-    private int maxRowNum = 0;
+    private int maxRowNum = 0; //row number of furthest row in front
+    private int minRowNum = 0; //row number of furthest row behind
     private int rowDirection = WithEnemyRowManager.SPAWN_FROM_RIGHT_MOVE_TO_LEFT;
     private GameObject player;
 
@@ -35,9 +37,14 @@ public class SceneManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (maxRowNum < (player.GetComponent<Player>().verticalCoordinate + ROWS_IN_ADVANCE))
+        if (maxRowNum < (player.GetComponent<Player>().verticalCoordinate + ROWS_AHEAD))
         {
             SpawnRow();
+        }
+
+        if (minRowNum < (player.GetComponent<Player>().verticalCoordinate - ROWS_BEHIND))
+        {
+            RemoveRow();
         }
     }
 
@@ -66,7 +73,7 @@ public class SceneManager : MonoBehaviour
     {
         player = Instantiate(playerPrefab, PLAYER_SPAWN_LOCATION, Quaternion.identity); //Spawn Player
 
-        GameObject firstRow = Instantiate(withoutEnemyRowPrefab, FIRST_ROW_SPAWN_LOCATION, Quaternion.identity); //Spawn First Row
+        GameObject firstRow = Instantiate(withoutEnemyRowPrefab, FIRST_ROW_SPAWN_LOCATION, Quaternion.identity); //Spawn First Row (Row num is 0)
         rowQueue.Enqueue(firstRow);
         rowCountdown = Random.Range(1, 4); //set first few spawns to be dangerous
     }
@@ -102,5 +109,18 @@ public class SceneManager : MonoBehaviour
         Vector3 newPosition = previousRow.transform.position + WithoutEnemyRowManager.ROW_SHIFT;
         GameObject row = Instantiate(withoutEnemyRowPrefab, newPosition, Quaternion.identity);
         rowQueue.Enqueue(row);
+    }
+
+    private void RemoveRow()
+    {
+        GameObject row = rowQueue.Dequeue();
+        if (row.GetComponent<WithEnemyRowManager>() != null) 
+        {
+            row.GetComponent<WithEnemyRowManager>().RemoveObjects();
+        }
+
+        Destroy(row);
+
+        minRowNum++;
     }
 }

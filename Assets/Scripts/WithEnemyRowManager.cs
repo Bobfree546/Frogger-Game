@@ -68,4 +68,12 @@ public class WithEnemyRowManager : MonoBehaviour
     {
         spawnDirection = direction;
     }
+
+    public void RemoveObjects()
+    {
+        foreach (GameObject enemy in EnemyList)
+        {
+            Destroy(enemy);
+        }
+    }
 }
